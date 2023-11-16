@@ -1,0 +1,57 @@
+inherit python-wheel
+
+NAME=python-pycurl
+VERSION=7.45.2
+RELEASE=1
+CATEGORY=Python
+SUMMARY='A Python interface to libcurl'
+DESCRIPTION="PycURL is a Python interface to libcurl, the multiprotocol file
+transfer library. Similarly to the urllib Python module, PycURL can be used to
+fetch objects identified by a URL from a Python program. Beyond simple fetches
+however PycURL exposes most of the functionality of libcurl."
+HOMEPAGE=http://pycurl.io/
+LICENSE='LGPL-2.1-only OR curl'
+
+PATCH_URI=per-package-docs.patch
+
+BUILD_REQUIRES='libcurl-devel libssl-devel'
+
+add_to_space_sep_string () {
+	local -n var="$1"
+	shift
+	local val
+	for val; do
+		var="${var:+$var }$val"
+	done
+}
+
+handle_python_versions () {
+	local version pkgversion
+	local -i majver minver
+	for version in ${PYTHON_WHEEL_VERSIONS//:/ }; do
+		pkgversion="${version/.}"
+		majver="${version%%.*}"
+		minver="${version#${majver}.}"
+		add_to_space_sep_string BUILD_REQUIRES \
+			"python${pkgversion}-wheel" \
+			"python${pkgversion}-devel"
+		# The below would only be required if we were capable of
+		# running the tests.
+		if ! :; then
+			if (( majver == 3 && minver < 11 )); then
+				add_to_space_sep_string BUILD_REQUIRES \
+					"python${pkgversion}-exceptiongroup"
+			fi
+		fi
+	done
+}
+
+handle_python_versions
+
+unset -f add_to_space_sep_string handle_python_versions
+
+src_test () {
+	# Tests currently fail because Cygwin doesn't have
+	# https://bottlepy.org/docs/stable/
+	:
+}

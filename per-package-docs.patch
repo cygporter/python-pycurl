@@ -1,0 +1,17 @@
+--- origsrc/pycurl-7.45.2/setup.py	2022-12-16 19:31:55.000000000 +0000
++++ src/pycurl-7.45.2/setup.py	2023-11-16 14:04:45.487511800 +0000
+@@ -665,7 +665,7 @@ def get_data_files():
+     if sys.platform == "win32":
+         datadir = os.path.join("doc", PACKAGE)
+     else:
+-        datadir = os.path.join("share", "doc", PACKAGE)
++        datadir = os.path.join("share", "doc", f"python{sys.version_info.major}{sys.version_info.minor}-{PACKAGE}")
+     #
+     files = ["AUTHORS", "ChangeLog", "COPYING-LGPL", "COPYING-MIT",
+         "INSTALL.rst", "README.rst", "RELEASE-NOTES.rst"]
+@@ -972,4 +972,5 @@ if __name__ == "__main__":
+ 
+         for o in ext.extra_objects:
+             assert os.path.isfile(o), o
++        from pprint import pprint; pprint(setup_args)
+         setup(**setup_args)
